@@ -52,6 +52,6 @@ locals {
 
 resource "aws_ecs_task_definition" "nginx" {
   family                = "nginx"
-  container_definitions = local.json_data.containerDefinitions
+  container_definitions = jsonencode(local.json_data.containerDefinitions)
   network_mode = "awsvpc"
 }
