@@ -23,12 +23,13 @@ resource "aws_subnet" "subnet" {
 
 resource "aws_ecs_cluster" "ecs" {
   name = "test-apps"
-  capacity_providers = "FARGATE_SPOT"
+  capacity_providers = ["FARGATE_SPOT"]
 }
 
 resource "aws_ecs_service" "nginx" {
   name            = "nginx"
   cluster         = aws_ecs_cluster.ecs.id
+  task_definition = aws_ecs_task_definition.nginx.arn
 
   ordered_placement_strategy {
     type  = "binpack"
@@ -43,4 +44,10 @@ resource "aws_ecs_service" "nginx" {
     type       = "memberOf"
     expression = "attribute:ecs.availability-zone in [us-west-2a, us-west-2b]"
   }
+}
+
+resource "aws_ecs_task_definition" "nginx" {
+  family                = "nginx"
+  container_definitions = file("../task-definition.json")
+  network_mode = "awsvpc"
 }
