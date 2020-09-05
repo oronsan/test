@@ -1,9 +1,9 @@
-[
+{
+    "family": "nginx",
+    "networkMode": "awsvpc",
+    "containerDefinitions":[
     {
         "cpu": 10,
-        "environment": [
-            {"name": "VARNAME", "value": "VARVAL"}
-        ],
         "essential": true,
         "image": "nginx",
         "memory": 128,
@@ -16,3 +16,4 @@
         ]
     }
 ]
+}
