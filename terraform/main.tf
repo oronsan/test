@@ -22,7 +22,7 @@ resource "aws_subnet" "subnet" {
 }
 
 resource "aws_ecs_cluster" "ecs" {
-  name = "test-apps"
+  name = local.cluster_name
   capacity_providers = ["FARGATE_SPOT"]
 }
 
@@ -55,4 +55,24 @@ resource "aws_ecs_task_definition" "nginx" {
   family                = "nginx"
   container_definitions = jsonencode(local.json_data.containerDefinitions)
   network_mode = "awsvpc"
+}
+
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.vpc.id
+}
+
+resource "aws_route_table" "route_table" {
+  vpc_id = aws_vpc.vpc.id
+}
+
+resource "aws_route_table_association" "route_table_assoc" {
+  subnet_id      = aws_subnet.subnet.id
+  route_table_id = aws_route_table.route_table.id
+}
+
+resource "aws_route" "public-subnet-to-igw" {
+  route_table_id         = aws_route_table.route_table.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id
 }
