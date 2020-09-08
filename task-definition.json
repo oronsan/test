@@ -4,7 +4,7 @@
     "containerDefinitions":[
     {
         "essential": true,
-        "image": "nginx",
+        "image": "nginx:latest",
 	"memory": 128,
         "name": "nginx",
         "portMappings": [
