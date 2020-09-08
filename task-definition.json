@@ -4,7 +4,7 @@
     "containerDefinitions":[
     {
         "essential": true,
-        "image": "nginx:latest",
+        "image": "752738072640.dkr.ecr.us-east-1.amazonaws.com/test:latest",
 	"memory": 128,
         "name": "nginx",
         "portMappings": [
