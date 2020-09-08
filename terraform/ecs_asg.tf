@@ -62,6 +62,7 @@ resource "aws_launch_configuration" "main" {
   instance_type               = "t2.micro"
   image_id                    = "ami-0878e35d09c75f0a1"
   associate_public_ip_address = true # false
+  key_name = "oron_own"
   security_groups             = [aws_security_group.main.id]
 
   user_data = <<EOF
@@ -70,6 +71,7 @@ resource "aws_launch_configuration" "main" {
 echo 'ECS_CLUSTER=${aws_ecs_cluster.ecs.name}' >> /etc/ecs/ecs.config
 # Disable privileged containers.
 echo 'ECS_DISABLE_PRIVILEGED=true' >> /etc/ecs/ecs.config
+echo 'ECS_INSTANCE_ATTRIBUTES = {"com.amazonaws.ecs.capability.ecr-auth": null, "com.amazonaws.ecs.capability.docker-remote-api.1.18": null, "ecs.capability.task-eni": null}' >> /etc/ecs/ecs.config
 EOF
 
 
