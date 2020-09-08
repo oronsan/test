@@ -14,51 +14,17 @@ resource "aws_ecr_repository" "test" {
   }
 }
 
+locals {
+  azs = ["us-east-1a", "us-east-1b"]
+  cidrs = ["10.0.0.0/24", "10.0.1.0/24"]
+}
+
 resource "aws_subnet" "subnet" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.subnet_cidr
-
-  availability_zone = "us-east-1a"
+  cidr_block = local.cidrs[count.index]
+  availability_zone = local.azs[count.index]
+  count = length(local.cidrs)
 }
-
-resource "aws_ecs_cluster" "ecs" {
-  name = local.cluster_name
-  capacity_providers = ["FARGATE_SPOT"]
-}
-
-resource "aws_ecs_service" "nginx" {
-  name            = "nginx"
-  cluster         = aws_ecs_cluster.ecs.id
-  task_definition = aws_ecs_task_definition.nginx.arn
-  desired_count   = 1
-
-  ordered_placement_strategy {
-    type  = "binpack"
-    field = "cpu"
-  }
-
-  network_configuration {
-    subnets = aws_subnet.subnet.*.id
-  }
-
-  placement_constraints {
-    type       = "memberOf"
-    expression = "attribute:ecs.availability-zone in [us-west-2a, us-west-2b]"
-  }
-}
-
-locals {
-  json_data = jsondecode(file("../task-definition.json"))
-}
-
-resource "aws_ecs_task_definition" "nginx" {
-  family                = "nginx"
-  container_definitions = jsonencode(local.json_data.containerDefinitions)
-  requires_compatibilities = ["EC2"]
-  memory = 128
-  network_mode = "awsvpc"
-}
-
 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.vpc.id
@@ -69,8 +35,9 @@ resource "aws_route_table" "route_table" {
 }
 
 resource "aws_route_table_association" "route_table_assoc" {
-  subnet_id      = aws_subnet.subnet.id
+  subnet_id      = aws_subnet.subnet.*.id[count.index]
   route_table_id = aws_route_table.route_table.id
+  count = length(aws_subnet.subnet.*.id)
 }
 
 resource "aws_route" "public-subnet-to-igw" {
