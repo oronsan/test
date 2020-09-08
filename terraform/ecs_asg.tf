@@ -1,4 +1,4 @@
-locals  {
+locals {
   cluster_name = "test-apps"
 }
 
