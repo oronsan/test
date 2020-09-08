@@ -55,6 +55,7 @@ resource "aws_ecs_task_definition" "nginx" {
   family                = "nginx"
   container_definitions = jsonencode(local.json_data.containerDefinitions)
   requires_compatibilities = ["EC2"]
+  memory = 128
   network_mode = "awsvpc"
 }
 
