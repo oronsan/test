@@ -78,12 +78,29 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-    - name: configure eks cluster
+  eks:
+    name: eks
+    runs-on: self-hosted
+
+    steps:
+    - name: checkout on self hosted
+      uses: actions/checkout@v2
+
+      #    - name: Setup Terraform
+      #uses: hashicorp/setup-terraform@v1
+
+    - name: get eks kubeconfig
+      shell: bash
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: us-east-1
       run: |
         mkdir -p ~/.kube
         cd terraform
+        terraform init
         terraform output kubeconfig > ~/.kube/config
-        terraform output config_map_aws_auth > /tmp/config_map_aws_auth.yaml
+        terraform output config_map_aws_auth > /tmp/config_map_aws_auth.yaml 
         cd /tmp
         curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/linux/amd64/kubectl
         chmod u+x ./kubectl
