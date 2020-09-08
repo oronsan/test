@@ -5,6 +5,7 @@
     {
         "essential": true,
         "image": "nginx",
+	"memory": 128,
         "name": "nginx",
         "portMappings": [
             {
