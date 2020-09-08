@@ -3,10 +3,8 @@
     "networkMode": "awsvpc",
     "containerDefinitions":[
     {
-        "cpu": 10,
         "essential": true,
         "image": "nginx",
-        "memory": 128,
         "name": "nginx",
         "portMappings": [
             {
